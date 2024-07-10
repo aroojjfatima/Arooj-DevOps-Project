@@ -1,0 +1,5 @@
+- name: Configure EC2 instance
+  hosts: all
+  become: yes
+  roles:
+    - common
