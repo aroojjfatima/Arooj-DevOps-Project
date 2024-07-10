@@ -34,3 +34,20 @@ data "aws_key_pair" "existing" {
  # content = tls_private_key.rsa-4096.public_key_openssh
   #filename = "${var.key_name}.pem"
 #}
+
+resource "local_file" "inventory" {
+  content  = <<EOF
+[web]
+${aws_instance.example.public_ip} ansible_user=ubuntu
+EOF
+  filename = "${path.module}/inventory"
+}
+
+resource "null_resource" "provision" {
+  provisioner "local-exec" {
+    command = "ansible-playbook -i ${local_file.inventory.filename} ansible/playbook.yml"
+  }
+
+  depends_on = [aws_instance.example]
+}
+
