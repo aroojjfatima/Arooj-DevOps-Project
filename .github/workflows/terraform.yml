@@ -25,7 +25,6 @@ jobs:
       run: terraform init
 
     - name: Terraform Apply
-      if: github.ref == 'refs/heads/main'
       run: terraform apply -auto-approve
       #env:
         #AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY }}
