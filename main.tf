@@ -22,21 +22,26 @@ provider "aws" {
   #}
 #}
 
-data "aws_key_pair" "existing" {
-  key_name = "my-key-pair" 
-}
+# data "aws_key_pair" "existing" {
+#   key_name = "id_rsa" 
+#   public_key = "~ssh/id_rsa.pub"
+# }
 
 # RSA key of size 4096 bits
-#resource "tls_private_key" "rsa-4096" {
- # algorithm = "RSA"
-  #rsa_bits  = 4096
-#}
+resource "tls_private_key" "rsa-4096" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
 
 #create key pair
-#resource "aws_key_pair" "key_pair" {
- # key_name   = var.key_name
-  #public_key = tls_private_key.rsa-4096.public_key_openssh
-#}
+resource "aws_key_pair" "key_pair" {
+ key_name   = "id_rsa"
+ public_key = file("~/.ssh/id_rsa.pub")
+}
+
+data "aws_key_pair" "existing" {
+  key_name = aws_key_pair.key_pair.key_name
+}
 
 #save in local system
 #resource "local_file" "private_key" {
