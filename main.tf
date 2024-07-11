@@ -13,6 +13,15 @@ provider "aws" {
   region = var.region
 }
 
+#resource "aws_instance" "example" {
+ # ami           = "ami-04a81a99f5ec58529" # Update with your preferred AMI ID
+  #instance_type = "t2.micro"
+
+  #tags = {
+   # Name = "Ansible-Configured-Instance"
+  #}
+#}
+
 data "aws_key_pair" "existing" {
   key_name = "my-key-pair" 
 }
