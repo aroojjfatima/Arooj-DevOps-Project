@@ -22,6 +22,11 @@ jobs:
         aws-access-key-id: ${{ secrets.ACCESS_KEY }}
         aws-secret-access-key: ${{ secrets.SECRET_KEY }}
         aws-region: us-east-1
+    
+    - name: Add SSH key to agent
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{secrets.ssh_public_key }}
 
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
