@@ -29,7 +29,8 @@ data "template_file" "inventory" {
 
 resource "local_file" "inventory" {
   depends_on = [aws_instance.example]
-  filename = "inventory.ini"
+  #filename = "inventory.ini"
+  filename = "${path.module}/ansible/inventory.ini"
   content = data.template_file.inventory.rendered
   provisioner "local-exec"{
     command = "chmod 400 ${local_file.inventory.filename}"
@@ -39,10 +40,14 @@ resource "local_file" "inventory" {
 resource "null_resource" "run_ansible" {
   depends_on = [local_file.inventory]
   provisioner "local-exec" {
-    command = "ansible-playbook -i inventory.ini ./ansible/playbook.yml"
+    command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${path.module}/ansible/inventory.ini ${path.module}/ansible/playbook.yml"
+    environment = {
+      ANSIBLE_HOST_KEY_CHECKING = "False"
+    }
     working_dir = path.module
   }
 }
+
 
 #resource "null_resource" "ansible_provision" {
   #provisioner "local-exec" {
