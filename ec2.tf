@@ -10,5 +10,13 @@ resource "aws_instance" "example" {
   }
 }
 
+resource "null_resource" "ansible_provision" {
+  provisioner "local-exec" {
+    command = "cd ./ansible && ansible-playbook -i inventory.ini playbook.yml"
+  }
+
+  depends_on = [aws_instance.example]
+}
+
 
 
