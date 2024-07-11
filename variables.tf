@@ -25,5 +25,5 @@ variable "ami_id" {
 
 variable "key_name" {
   description = "Name of the SSH key pair"
-  default     = "my-key-pair"
+  default     = "mykeypair"
 }

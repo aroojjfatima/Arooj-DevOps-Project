@@ -11,10 +11,19 @@ resource "aws_instance" "example" {
 }
 
 resource "null_resource" "ansible_provision" {
-  provisioner "local-exec" {
-    command = "cd ./ansible && ansible-playbook -i inventory.ini playbook.yml"
-  }
+  #provisioner "local-exec" {
+  #  command = "cd ./ansible && ansible-playbook -i inventory.ini playbook.yml"
+  #}
 
+  #depends_on = [aws_instance.example]
+  provisioner "local-exec" {
+    command = <<EOT
+      cd ./ansible
+      echo "[example]" > inventory
+      echo "${aws_instance.example.public_ip} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/mykeypair" >> inventory
+      ansible-playbook -i inventory playbook.yml -vvv
+    EOT
+  }
   depends_on = [aws_instance.example]
 }
 
