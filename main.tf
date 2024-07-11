@@ -27,26 +27,24 @@ provider "aws" {
 #   public_key = "~ssh/id_rsa.pub"
 # }
 
-# RSA key of size 4096 bits
-resource "tls_private_key" "rsa-4096" {
+resource "tls_private_key" "rsa_4096" {
   algorithm = "RSA"
   rsa_bits  = 4096
 }
-
-#create key pair
+resource "local_file" "private_key" {
+  content  = tls_private_key.rsa_4096.private_key_pem
+  filename = "terraform-key.pem"
+  provisioner "local-exec" {
+    command = "chmod 400 terraform-key.pem"  # Secure the private key file
+  }
+}
 resource "aws_key_pair" "key_pair" {
- key_name   = "id_rsa"
- #public_key = file("~/.ssh/id_rsa.pub")
- public_key = var.ssh_public_key
-}
-variable "ssh_public_key" {
-  description = "The public key for SSH access"
-  type        = string
-}
-
-data "aws_key_pair" "existing" {
-  key_name = aws_key_pair.key_pair.key_name
-}
+  key_name   = "terraform-key"
+  public_key = tls_private_key.rsa_4096.public_key_openssh
+}# resource "aws_key_pair" "Proj_Shahmir_deployer_key" {
+#   key_name   = "id_rsa"
+#   public_key = file(var.public_key_path)
+# }
 
 #save in local system
 #resource "local_file" "private_key" {
