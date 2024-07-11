@@ -18,19 +18,30 @@ resource "aws_instance" "example" {
     #cd ./ansible
     command = "touch inventory.ini"
   }
+  provisioner "remote-exec" {
+      inline = [
+        "echo 'EC2 instance is ready.'"
+      ]
+      connection {
+        type        = "ssh"
+        host        = aws_instance.example.public_ip
+        user        = "ubuntu"
+        private_key = tls_private_key.rsa_4096.private_key_pem
+      }
+  }
 }
 
 data "template_file" "inventory" {
   template = <<-EOT
     [example]
-    ${aws_instance.example.public_ip} ansible_user=ubuntu ansible_private_key_file=~/.ssh/id_rsa
+    ${aws_instance.example.public_ip} ansible_user=ubuntu ansible_private_key_file=terraform-key.pem
+
     EOT
 }
 
 resource "local_file" "inventory" {
   depends_on = [aws_instance.example]
-  #filename = "inventory.ini"
-  filename = "${path.module}/ansible/inventory.ini"
+  filename = "inventory.ini"
   content = data.template_file.inventory.rendered
   provisioner "local-exec"{
     command = "chmod 400 ${local_file.inventory.filename}"
@@ -38,16 +49,11 @@ resource "local_file" "inventory" {
 }
 
 resource "null_resource" "run_ansible" {
-  depends_on = [local_file.inventory]
+  depends_on = [ local_file.inventory ]  
   provisioner "local-exec" {
-    command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${path.module}/ansible/inventory.ini ${path.module}/ansible/playbook.yml"
-    environment = {
-      ANSIBLE_HOST_KEY_CHECKING = "False"
-    }
-    working_dir = path.module
+     command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory.ini ./ansible/playbook.yml -- "  
   }
 }
-
 
 #resource "null_resource" "ansible_provision" {
   #provisioner "local-exec" {
