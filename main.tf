@@ -36,7 +36,12 @@ resource "tls_private_key" "rsa-4096" {
 #create key pair
 resource "aws_key_pair" "key_pair" {
  key_name   = "id_rsa"
- public_key = file("~/.ssh/id_rsa.pub")
+ #public_key = file("~/.ssh/id_rsa.pub")
+ public_key = var.ssh_public_key
+}
+variable "ssh_public_key" {
+  description = "The public key for SSH access"
+  type        = string
 }
 
 data "aws_key_pair" "existing" {
