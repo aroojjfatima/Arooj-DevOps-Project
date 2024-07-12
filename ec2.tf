@@ -15,7 +15,6 @@ resource "aws_instance" "example" {
   }
 
   provisioner "local-exec" {
-    #cd ./ansible
     command = "touch inventory.ini"
   }
   provisioner "remote-exec" {
@@ -54,21 +53,5 @@ resource "null_resource" "run_ansible" {
      command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory.ini ./ansible/playbook.yml -- "  
   }
 }
-
-#resource "null_resource" "ansible_provision" {
-  #provisioner "local-exec" {
-   # command = <<EOT
-    #  echo "[example]" > ./ansible/inventory.ini
-     # echo "${aws_instance.example.public_ip} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa" >> ./ansible/inventory.ini
-      #cat ./ansible/inventory.ini
-      #cd ./ansible
-      #ansible-playbook -i inventory.ini playbook.yml -vvv
-    #EOT
-  #}
-
-  #depends_on = [aws_instance.example]
-#}
-
-
 
 
